@@ -111,9 +111,9 @@ resource "aws_route53_record" "website" {
 
 # Redirection buckets
 resource "aws_s3_bucket" "redirect" {
-  for_each = toset(var.redirects)
-  bucket   = each.value
-  tags     = var.tags
+  count  = length(var.redirects)
+  bucket = var.redirects[count.index]
+  tags   = var.tags
 
   website {
     redirect_all_requests_to = "https://${var.domain_name}"
@@ -122,16 +122,16 @@ resource "aws_s3_bucket" "redirect" {
 
 # CloudFront distributions to serve the redirection URLs
 resource "aws_cloudfront_distribution" "redirect" {
-  for_each        = toset(var.redirects)
+  count           = length(var.redirects)
   comment         = var.description
   tags            = var.tags
-  aliases         = [each.value]
+  aliases         = [var.redirects[count.index]]
   enabled         = true
   is_ipv6_enabled = true
 
   origin {
-    domain_name = aws_s3_bucket.redirect[each.key].website_endpoint
-    origin_id   = each.value
+    domain_name = aws_s3_bucket.redirect[count.index].website_endpoint
+    origin_id   = var.redirects[count.index]
 
     custom_origin_config {
       http_port              = 80
@@ -155,7 +155,7 @@ resource "aws_cloudfront_distribution" "redirect" {
   default_cache_behavior {
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = each.value
+    target_origin_id       = var.redirects[count.index]
     viewer_protocol_policy = "allow-all"
 
     forwarded_values {
@@ -169,14 +169,14 @@ resource "aws_cloudfront_distribution" "redirect" {
 
 # DNS entries for the redirection distributions
 resource "aws_route53_record" "redirect" {
-  for_each = toset(var.redirects)
-  zone_id  = var.zone_id
-  name     = each.value
-  type     = "A"
+  count   = length(var.redirects)
+  zone_id = var.zone_id
+  name    = var.redirects[count.index]
+  type    = "A"
 
   alias {
-    name                   = aws_cloudfront_distribution.redirect[each.key].domain_name
-    zone_id                = aws_cloudfront_distribution.redirect[each.key].hosted_zone_id
+    name                   = aws_cloudfront_distribution.redirect[count.index].domain_name
+    zone_id                = aws_cloudfront_distribution.redirect[count.index].hosted_zone_id
     evaluate_target_health = false
   }
 }
