@@ -1,3 +1,10 @@
+# ACM certificates for use with CloudFront must be in US East 1
+provider "aws" {
+  version = "~> 2.0"
+  region  = "us-east-1"
+  alias   = "us-east"
+}
+
 # Certificate for the domain name and any redirect urls
 module "certificate" {
   source                    = "stuartizon/certificate/aws"
@@ -5,6 +12,10 @@ module "certificate" {
   domain_name               = var.domain_name
   subject_alternative_names = var.redirects
   zone_id                   = var.zone_id
+
+  providers = {
+    aws = aws.us-east
+  }
 }
 
 # Access policy so only CloudFront has access to the S3 bucket
