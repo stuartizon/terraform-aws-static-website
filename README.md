@@ -1,7 +1,7 @@
 # Terraform AWS Static Website
 Terraform module which creates all the resources you'll need to run a static website with AWS S3 and CloudFront.
 
-Static Website Generators are more popular than ever, but deploying everything you need to run a static website on AWS can be challenging to the uninitiated and it's easy to forget some of the details even if you've done this sort of thing many times before. That's where this module comes in.
+Single Page Applications and Static Website Generators are more popular than ever, but deploying everything you need to run a static website on AWS can be challenging to the uninitiated and it's easy to forget some of the details even if you've done this sort of thing many times before. That's where this module comes in.
 
 The module sets up for you:
 - an S3 bucket to put your web resources into
