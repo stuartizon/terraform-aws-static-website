@@ -8,7 +8,7 @@ provider "aws" {
 # Certificate for the domain name and any redirect urls
 module "certificate" {
   source                    = "stuartizon/certificate/aws"
-  version                   = "0.1.2"
+  version                   = "0.1.4"
   domain_name               = var.domain_name
   subject_alternative_names = var.redirects
   zone_id                   = var.zone_id
